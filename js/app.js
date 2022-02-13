@@ -39,9 +39,12 @@ function initThree(){
 
     // useSphere();
     // useBox();
-    useSphere()
+    useSphere();
 
     initPoints();
+
+    drawingLines();
+    setAudio()
 
     loop();
 }
@@ -127,4 +130,37 @@ function initPoints(){
             alert("欢迎访问"+intersects[0].object.detail.title);
         }
     });
+}
+
+/**
+ * 画线
+ * **/
+function drawingLines() {
+    // 画线需要 线和点组成
+    var lineMeterial = new THREE.LineBasicMaterial({ color: 'red' });
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(new THREE.Vector3(-10, 0, 0));
+    geometry.vertices.push(new THREE.Vector3(0, 10, 0))
+    geometry.vertices.push(new THREE.Vector3(10, 0, 0))
+    var line = new THREE.Line(geometry, lineMeterial)
+    scene.add(line);
+}
+
+/**
+ * 创建音频
+ * **/
+
+function setAudio() {
+    var listener = new THREE.AudioListener();
+    camera.add( listener );
+    var sound = new THREE.Audio( listener );
+
+    var audioLoader = new THREE.AudioLoader();
+    audioLoader.load('sounds/Backroad.ogg', function (buffer) {
+        sound.setBuffer( buffer );
+        sound.setLoop( true )
+        sound.setVolume(0.5)
+        sound.play()
+    })
+
 }
