@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script src="js/GLFTLoader.js"></script>
+		<script>
+			setGLFT3D();
+			function init1() {
+				var scene = new THREE.Scene();
+				var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				var renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				//添加立方体
+				var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+				var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+				var cube = new THREE.Mesh( geometry, material );
+				scene.add( cube );
+				camera.position.z = 5;
+				function animate() {
+					requestAnimationFrame( animate );
+					cube.rotation.x += 0.01;
+					cube.rotation.y += 0.01;
+					renderer.render( scene, camera );
+				}
+				animate();
+			}
+			function drawLine() {
+				var renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+				camera.position.set( 0, 0, 100 );
+				camera.lookAt( 0, 0, 0 );
+				var scene = new THREE.Scene();
+
+				//create a blue LineBasicMaterial
+				const material = new THREE.LineBasicMaterial({color:'#fff'})
+				//这里用这个构造
+				const geometry = new THREE.BufferGeometry()
+				const pointsArray = new Array()
+				//加2000个顶点，范围为-1到1
+				for(let i = 0;i<2000;i++){
+				const x = Math.random() * 2 - 1 //范围在-1到1
+				const y = Math.random() * 2 - 1
+				const z = Math.random() * 2 - 1 
+				pointsArray.push(new THREE.Vector3(x,y,z))
+				//顶点
+				//geometry.vertices.push(new THREE.Vector3(x,y,z))
+				}
+				//用这个api传入顶点数组
+				geometry.setFromPoints(pointsArray)
+				//下述基本一样
+				const mesh = new THREE.Line(geometry,material)
+				mesh.position.set(0,6,0)
+				scene.add(mesh)
+				renderer.render( scene, camera );
+				console.log("line现在已经被添加")
+			}
+			function setGLFT3D() {
+				var scene = new THREE.Scene();
+				var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				var renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'source/man/scene.gltf', function ( gltf ) {
+					console.log('result')
+					console.log(gltf)
+					scene.add( gltf.scene );
+					gltf.animations; // Array<THREE.AnimationClip>
+					gltf.scene; // THREE.Scene
+					gltf.scenes; // Array<THREE.Scene>
+					gltf.cameras; // Array<THREE.Camera>
+					gltf.asset; // Object
+				}, function ( xhr ) {
+					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+				}, function ( error ) {
+					console.log('load 3D error')
+					console.error( error );
+				} );
+			}
+			function setOBJ3D() {
+				renderer = new THREE.WebGLRenderer({//渲染器
+                    canvas: document.getElementById('mainCanvas')//画布
+                });
+                renderer.setClearColor(0x000000);//画布颜色
+                scene = new THREE.Scene();//创建场景
+                
+                camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);//正交投影照相机
+                camera.position.set(15, 25, 25);//相机位置
+                camera.lookAt(new THREE.Vector3(0, 2, 0));//lookAt()设置相机所看的位置
+                scene.add(camera);//把相机添加到场景中
+                
+                var loader = new THREE.OBJLoader();//在init函数中，创建loader变量，用于导入模型
+                loader.load('libs/port.obj', function(obj) {//第一个表示模型路径，第二个表示完成导入后的回调函数，一般我们需要在这个回调函数中将导入的模型添加到场景中
+                    obj.traverse(function(child) {
+                        if (child instanceof THREE.Mesh) {
+                            child.material.side = THREE.DoubleSide;
+                        }
+                    });
+                
+                    mesh = obj;//储存到全局变量中
+                    scene.add(obj);//将导入的模型添加到场景中
+                });
+                
+                var light = new THREE.DirectionalLight(0xffffff);//光源颜色
+                light.position.set(20, 10, 5);//光源位置
+                scene.add(light);//光源添加到场景中
+                
+                id = setInterval(draw, 20);//每隔20s重绘一次
+			}
+		</script>
+	</body>
+</html>
+
+<style>
+#info {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	z-index: 100;
+	display:block;
+}
+</style>

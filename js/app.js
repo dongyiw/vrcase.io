@@ -37,14 +37,12 @@ function initThree(){
     
     var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    // useSphere();
     // useBox();
     useSphere();
 
     initPoints();
-
-    drawingLines();
-    setAudio()
+    setAudio();
+    set3DModal();
 
     loop();
 }
@@ -162,5 +160,23 @@ function setAudio() {
         sound.setVolume(0.5)
         sound.play()
     })
+
+}
+
+/**
+ * 3D Modal
+ * **/
+function set3DModal(){
+    var loader = new THREE.GLTFLoader()
+    loader.load('source/man/scene.gltf', function (gltf) {
+        scene.add( gltf.scene );
+        gltf.animations; // Array<THREE.AnimationClip>
+		gltf.scene; // THREE.Scene
+		gltf.scenes; // Array<THREE.Scene>
+		gltf.cameras; // Array<THREE.Camera>
+		gltf.asset; // Object
+    }, undefined, function ( error ) {
+        console.error( error );
+    } );
 
 }
