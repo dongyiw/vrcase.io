@@ -89,3 +89,35 @@ a, button, input, select {
 	margin-top: 20px;
 	padding: 10px;
 }
+
+.navbar{
+	display: flex;
+	align-items: center;
+}
+.navbar-container{
+	position: fixed;
+	display: flex;
+	align-items: center;
+	top: 40px;
+	right: 20px;
+}
+.bar img{
+	width: 30px;
+}
+.bar{
+	margin-right: 20px;
+	line-height: 0;
+	border-radius: 50%;
+	padding: 10px;
+	background-color: rgba(0,0,0,0.7);
+	cursor: pointer;
+}
+
+@media screen and (max-width: 960px) {
+	.bar{
+		margin-right: 5px;
+	}
+	.bar img{
+		width: 15px;
+	}
+}

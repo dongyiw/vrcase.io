@@ -20,9 +20,19 @@
 	<body>
 
 		<div id="container"></div>
+		<div id="navbar">
+			<div class="navbar-container">
+				<div class="bar" id="audioPlay"><img src="./static/play.png" ></div>
+				<div class="bar" id="audioPause" style="display: none;"><img src="./static/pause.png"></div>
+			</div>
+		</div>
+		<video id="video" loop width="400" height="300" crossOrigin="anonymous" webkit-playsinline  preload>
+			<source src="./static/video/video.webm">
+		</video>
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
 		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script src="./build/jquery-3.6.0.min.js"></script>
 
 		<script type="importmap">
 			{
@@ -66,9 +76,14 @@
 			scene.background = new THREE.Color( 0xbfe3dd );  // 设置场景的颜色
 			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
+			//添加光源
+			const light = new THREE.DirectionalLight( 0xffffff );
+			light.position.set( 0.5, 1, 1 ).normalize();
+			scene.add( light );
+
 			// const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			// camera.position.set( 5, 2, 8 );
-            const camera = new THREE.PerspectiveCamera(120, document.body.clientWidth / document.body.clientHeight, 0.1, 100);
+            const camera = new THREE.PerspectiveCamera(90, document.body.clientWidth / document.body.clientHeight, 0.1, 100);
             camera.position.set(0, 0, 0.01);
 
 			const controls = new OrbitControls( camera, renderer.domElement );
@@ -81,10 +96,19 @@
 			dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
             useSphere()
 
+			//全局audio声明
+			var listener = new THREE.AudioListener();
+			camera.add( listener );
+
+			// create a global audio source
+			var sound = new THREE.Audio( listener );
+
 
 			loadAnimateModel2();
 			loadAnimateModel3();
 			loadAnimateModel();
+			audioInit();
+			videoInit();
 
 			window.onresize = function () {
 
@@ -163,6 +187,49 @@
 				} );
 			}
 
+			/**
+			*audio相关
+			*
+			**/
+			function audioInit() {
+				// load a sound and set it as the Audio object's buffer
+				var audioLoader = new THREE.AudioLoader();
+				audioLoader.load( './static/sounds/Backroad.ogg', function( buffer ) {
+					sound.setBuffer( buffer );
+					sound.setLoop( true );
+					sound.setVolume( 0.5 );
+				});
+			}
+			function audioPlay() {
+				console.log('start play audio')
+				sound.play();
+			}
+			function audioPause() {
+				console.log('start pause audio')
+				sound.pause();
+			}
+
+			/**
+			*视频相关
+			**/
+			function videoInit(){
+
+				//assuming you have created a HTML video element with id="video"
+				var video = document.getElementById( 'video' );
+
+				var texture = new THREE.VideoTexture( video );
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.format = THREE.RGBFormat;
+
+				let geometry = new THREE.BoxGeometry( 1, 50, 50 );
+				let material = new THREE.MeshLambertMaterial( {map: texture} ); 
+				let mesh = new THREE.Mesh( geometry, material );
+				mesh.position.set( 0.01, 0.2, 0 );
+				mesh.scale.set( 0.008, 0.008, 0.008 );
+				scene.add( mesh );
+				
+			}
 
 			function animate() {
 
@@ -194,6 +261,19 @@
                 // sphere.material.wireframe  = true;
                 scene.add(sphere);
             }
+			$(document).ready(function(){
+				$("#audioPlay").click(function(){
+					audioPlay()
+					$('#audioPlay').hide();
+					$('#audioPause').show();
+
+				});
+				$("#audioPause").click(function(){
+					audioPause()
+					$('#audioPause').hide();
+					$('#audioPlay').show();
+				});
+			});
 		</script>
 
 	</body>
