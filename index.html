@@ -5,6 +5,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="./css/main.css">
+		<link type="text/css" rel="stylesheet" href="./css/loading.css">
+	
 		<style>
 			body {
 				background-color: #bfe3dd;
@@ -18,13 +20,23 @@
 	</head>
 
 	<body>
-
+		<div id="loading">
+			<div id="loadingIcon"></div>
+		</div>
 		<div id="container"></div>
 		<div id="navbar">
 			<div class="navbar-container">
 				<div class="bar" id="audioPlay"><img src="./static/play.png" ></div>
 				<div class="bar" id="audioPause" style="display: none;"><img src="./static/pause.png"></div>
 			</div>
+		</div>
+		<div>
+			<div class="preview ope-icon" id="preview">
+				<img src="./static/preview.png">
+			</div>
+			<div class="next ope-icon" id="next">
+				<img src="./static/next.png" >
+				</div>
 		</div>
 		<video id="video" loop width="400" height="300" crossOrigin="anonymous" webkit-playsinline  preload>
 			<source src="./static/video/video.webm">
@@ -61,6 +73,16 @@
 
 			const stats = new Stats();
 			container.appendChild( stats.dom );
+			//定义背景图片数组
+			const textureArray = [
+				'./static/qj5.jpeg',
+				'./static/qj2.jpg',
+				'./static/qj3.jpeg',
+				'./static/qj4.jpeg',
+				'./static/qj6.jpeg',
+				'./static/qj1.jpeg'
+			]
+			let currentTextureIndex = 0
 
             // 添加渲染器
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -123,17 +145,16 @@
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( dracoLoader );
 				loader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
-
-					const model = gltf.scene;
+					const mesh = gltf.scene;
 					// model.position.set( 1, 1, 0 );
-					model.position.set( 0.01, 0.2, -0.8 );
-					model.scale.set( 0.005, 0.005, 0.005 );
-					scene.add( model );
+					mesh.position.set( 0.01, 0.2, -0.8 );
+					mesh.scale.set( 0.003, 0.003, 0.003 );
+					scene.add( mesh );
 
-					mixer = new THREE.AnimationMixer( model );
+					mixer = new THREE.AnimationMixer( mesh );
+					console.log(gltf.animations)
 					mixer.clipAction( gltf.animations[ 0 ] ).play();
-
-
+					animate();
 				}, undefined, function ( e ) {
 
 					console.error( e );
@@ -149,10 +170,13 @@
 					const model = gltf.scene;
 					// model.position.set( 1, 1, 0 );
 					model.position.set( 0.5, 0.2, 0.8 );
-					model.scale.set( 0.005, 0.005, 0.005 );
+					model.scale.set( 0.004, 0.004, 0.004 );
 					scene.add( model );
 
 					mixer = new THREE.AnimationMixer( model );
+					console.log('animate 2')
+					console.log(gltf.animations)
+					
 					mixer.clipAction( gltf.animations[ 0 ] ).play();
 
 					animate();
@@ -246,21 +270,40 @@
 				renderer.render( scene, camera );
 
 			}
-
-            function useSphere(){
+			
+            function useSphere(index = 0){
                 var sphereGeometry = new THREE.SphereGeometry(1, 50, 50);
                 sphereGeometry.scale(1, 1, -1);
                 sphereGeometry.rotateY(180*Math.PI/180);
 
-                var texture = new THREE.TextureLoader().load('./static/qj2.jpg');
+                var texture = new THREE.TextureLoader().load(textureArray[index]);
                 var sphereMaterial = new THREE.MeshBasicMaterial({map: texture});
 
                 // var sphereGeometry = new THREE.SphereGeometry(50, 20, 20);
 
                 var sphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
                 // sphere.material.wireframe  = true;
+				sphere.name = 'sphere1'
                 scene.add(sphere);
             }
+			pageLoading()
+			function pageLoading(){
+				var icon = document.getElementById('loadingIcon')
+				var loading = document.getElementById('loading')
+				loading.classList.add('loading')
+				icon.classList.add('loader8')	
+				loading.classList.remove('loading-out')
+			}
+			window.setTimeout(function(){
+										pageLoaded()
+								}, 600)			
+			function pageLoaded(){
+				var icon = document.getElementById('loadingIcon')
+				var loading = document.getElementById('loading')
+				loading.classList.remove('loading')
+				loading.classList.add('loading-out')
+				icon.classList.remove('loader8')
+			}
 			$(document).ready(function(){
 				$("#audioPlay").click(function(){
 					audioPlay()
@@ -272,6 +315,34 @@
 					audioPause()
 					$('#audioPause').hide();
 					$('#audioPlay').show();
+				});
+				$("#next").click(function(){
+					let sceneObject = scene.getObjectByName('sphere1');
+					scene.remove( sceneObject );
+					pageLoading()
+					window.setTimeout(function(){
+							pageLoaded()
+					}, 600)		
+					let index = ++currentTextureIndex
+					if(index >= textureArray.length){
+						index = 0
+						currentTextureIndex = index
+					}
+					useSphere(index)
+				});
+				$("#preview").click(function(){
+					let sceneObject = scene.getObjectByName('sphere1');
+					scene.remove( sceneObject );
+					pageLoading()
+					window.setTimeout(function(){
+							pageLoaded()
+					}, 600)		
+					let index = --currentTextureIndex
+					if(index < 0){
+						index = textureArray.length -1
+						currentTextureIndex = index
+					}
+					useSphere(index)
 				});
 			});
 		</script>

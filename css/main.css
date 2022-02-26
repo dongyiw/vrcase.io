@@ -112,6 +112,26 @@ a, button, input, select {
 	background-color: rgba(0,0,0,0.7);
 	cursor: pointer;
 }
+.ope-icon{
+	position: fixed;
+	z-index: 1000;
+	top: 50%;
+	transform: translate(0, -50%);
+	line-height: 0;
+	border-radius: 50%;
+	padding: 10px;
+	background-color: rgba(0,0,0,0.7);
+	cursor: pointer;
+}
+.ope-icon img{
+	width: 40px;
+}
+.next{
+	right: 20px;
+}
+.preview{
+	left: 20px;
+}
 
 @media screen and (max-width: 960px) {
 	.bar{
@@ -119,5 +139,8 @@ a, button, input, select {
 	}
 	.bar img{
 		width: 15px;
+	}
+	.ope-icon img{
+		width: 25px;
 	}
 }
