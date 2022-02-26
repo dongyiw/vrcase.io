@@ -20,8 +20,8 @@
 	</head>
 
 	<body>
-		<div id="loading">
-			<div id="loadingIcon"></div>
+		<div id="loading" class="loading">
+			<div id="loadingIcon" class="loader8"></div>
 		</div>
 		<div id="container"></div>
 		<div id="navbar">
@@ -128,6 +128,7 @@
 
 			loadAnimateModel2();
 			loadAnimateModel3();
+			loadPerson()
 			loadAnimateModel();
 			audioInit();
 			// videoInit();
@@ -140,14 +141,28 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			};
+			function loadPerson() {
+				const loader = new GLTFLoader();
+				loader.setDRACOLoader( dracoLoader );
+				loader.load( 'models/realistic_women/scene.gltf', function ( gltf ) {
+					const mesh = gltf.scene;
+					// model.position.set( 1, 1, 0 );
+					mesh.position.set( 0, -0.2, -0.4 );
+					mesh.scale.set( 0.0002, 0.0002, 0.0002 );
+					scene.add( mesh );
+				}, undefined, function ( e ) {
 
+					console.error( e );
+
+				} );
+			}
 			function loadAnimateModel() {
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( dracoLoader );
 				loader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
 					const mesh = gltf.scene;
 					// model.position.set( 1, 1, 0 );
-					mesh.position.set( 0.01, 0.2, -0.8 );
+					mesh.position.set( 0.2, 0.4, -0.8 );
 					mesh.scale.set( 0.003, 0.003, 0.003 );
 					scene.add( mesh );
 
@@ -286,7 +301,6 @@
 				sphere.name = 'sphere1'
                 scene.add(sphere);
             }
-			pageLoading()
 			function pageLoading(){
 				var icon = document.getElementById('loadingIcon')
 				var loading = document.getElementById('loading')
@@ -296,7 +310,7 @@
 			}
 			window.setTimeout(function(){
 										pageLoaded()
-								}, 600)			
+								}, 1500)			
 			function pageLoaded(){
 				var icon = document.getElementById('loadingIcon')
 				var loading = document.getElementById('loading')
@@ -336,7 +350,7 @@
 					pageLoading()
 					window.setTimeout(function(){
 							pageLoaded()
-					}, 600)		
+					}, 1500)		
 					let index = --currentTextureIndex
 					if(index < 0){
 						index = textureArray.length -1
