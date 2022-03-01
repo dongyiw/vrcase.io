@@ -1,366 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>philips 3D Model Demo</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="./css/main.css">
-		<link type="text/css" rel="stylesheet" href="./css/loading.css">
-	
-		<style>
-			body {
-				background-color: #bfe3dd;
-				color: #000;
-			}
+  <head>
+    <title>philips 3D Model Demo</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <link type="text/css" rel="stylesheet" href="./css/main.css" />
+    <link type="text/css" rel="stylesheet" href="./css/loading.css" />
 
-			a {
-				color: #2983ff;
-			}
-		</style>
-	</head>
+    <style>
+      body {
+        background-color: #bfe3dd;
+        color: #000;
+      }
 
-	<body>
-		<div id="loading" class="loading">
-			<div id="loadingIcon" class="loader8"></div>
-		</div>
-		<div id="container"></div>
-		<div id="navbar">
-			<div class="navbar-container">
-				<div class="bar" id="audioPlay"><img src="./static/play.png" ></div>
-				<div class="bar" id="audioPause" style="display: none;"><img src="./static/pause.png"></div>
-			</div>
-		</div>
-		<div>
-			<div class="preview ope-icon" id="preview">
-				<img src="./static/preview.png">
-			</div>
-			<div class="next ope-icon" id="next">
-				<img src="./static/next.png" >
-				</div>
-		</div>
-		<video id="video" loop width="400" height="300" crossOrigin="anonymous" webkit-playsinline  preload>
-			<source src="./static/video/video.webm">
-		</video>
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+      a {
+        color: #2983ff;
+      }
+    </style>
+  </head>
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "./build/three.module.js"
-				}
-			}
-		</script>
-		<script src="./build/jquery-3.6.0.min.js"></script>
+  <body>
+    <div id="loading" class="loading">
+      <div id="loadingIcon" class="loader8"></div>
+    </div>
+    <div id="container"></div>
+    <div id="navbar">
+      <div class="navbar-container">
+        <div class="bar" id="audioPlay"><img src="./static/play.png" /></div>
+        <div class="bar" id="audioPause" style="display: none">
+          <img src="./static/pause.png" />
+        </div>
+      </div>
+    </div>
+    <div style="position: absolute; top: 0; right: 0">
+      X:
+      <input id="rotateInputX" type="number" />
+      y:
+      <input id="rotateInputY" type="number" />
+      Z:
+      <input id="rotateInputZ" type="number" />
+    </div>
+    <div>
+      <div class="preview ope-icon" id="preview">
+        <img src="./static/preview.png" />
+      </div>
+      <div class="next ope-icon" id="next">
+        <img src="./static/next.png" />
+      </div>
+    </div>
+    <video
+      id="video"
+      loop
+      width="400"
+      height="300"
+      crossorigin="anonymous"
+      webkit-playsinline
+      autoplay
+      preload
+    >
+      <source src="./static/video/video.webm" />
+    </video>
+    <!-- Import maps polyfill -->
+    <!-- Remove this when import maps will be widely supported -->
+    <script
+      async
+      src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+    ></script>
 
-		<script type="module">
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./build/three.module.js"
+        }
+      }
+    </script>
+    <script src="./build/jquery-3.6.0.min.js"></script>
 
-			import * as THREE from 'three';
+    <script type="module">
+      import * as THREE from 'three'
 
-			import Stats from './jsm/libs/stats.module.js';
+      import Stats from './jsm/libs/stats.module.js'
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+      import { OrbitControls } from './jsm/controls/OrbitControls.js'
+      import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js'
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+      import { GLTFLoader } from './jsm/loaders/GLTFLoader.js'
+      import { DRACOLoader } from './jsm/loaders/DRACOLoader.js'
 
-			let mixer;
+      let mixer
 
-			const clock = new THREE.Clock();
-			const container = document.getElementById( 'container' );
+      const clock = new THREE.Clock()
+      const container = document.getElementById('container')
 
-			const stats = new Stats();
-			container.appendChild( stats.dom );
-			//定义背景图片数组
-			const textureArray = [
-				'./static/qj5.jpeg',
-				'./static/qj2.jpg',
-				'./static/qj3.jpeg',
-				'./static/qj4.jpeg',
-				'./static/qj6.jpeg',
-				'./static/qj1.jpeg'
-			]
-			let currentTextureIndex = 0
+      const stats = new Stats()
+      container.appendChild(stats.dom)
+      //定义背景图片数组
+      const textureArray = [
+        './static/qj5.jpeg',
+        './static/qj2.jpg',
+        './static/qj3.jpeg',
+        './static/qj4.jpeg',
+        './static/qj6.jpeg',
+        './static/qj1.jpeg',
+      ]
+      let currentTextureIndex = 0
 
-            // 添加渲染器
-			const renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputEncoding = THREE.sRGBEncoding;
-			container.appendChild( renderer.domElement );
+      // 添加渲染器
+      const renderer = new THREE.WebGLRenderer({ antialias: true })
+      renderer.setPixelRatio(window.devicePixelRatio)
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      renderer.outputEncoding = THREE.sRGBEncoding
+      container.appendChild(renderer.domElement)
 
-			const pmremGenerator = new THREE.PMREMGenerator( renderer );
-            
-            // 添加场景
-			const scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xbfe3dd );  // 设置场景的颜色
-			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+      const pmremGenerator = new THREE.PMREMGenerator(renderer)
 
-			//添加光源
-			const light = new THREE.DirectionalLight( 0xffffff );
-			light.position.set( 0.5, 1, 1 ).normalize();
-			scene.add( light );
+      // 添加场景
+      const scene = new THREE.Scene()
+      scene.background = new THREE.Color(0xbfe3dd) // 设置场景的颜色
+      scene.environment = pmremGenerator.fromScene(
+        new RoomEnvironment(),
+        0.04
+      ).texture
 
-			// const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
-			// camera.position.set( 5, 2, 8 );
-            const camera = new THREE.PerspectiveCamera(90, document.body.clientWidth / document.body.clientHeight, 0.1, 100);
-            camera.position.set(0, 0, 0.01);
+      //添加光源
+      const light = new THREE.DirectionalLight(0xffffff)
+      light.position.set(0.5, 1, 1).normalize()
+      scene.add(light)
 
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.target.set( 0, 0, 0 );
-			controls.update();
-			controls.enablePan = false;
-			controls.enableDamping = true;
+      // const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+      // camera.position.set( 5, 2, 8 );
+      const camera = new THREE.PerspectiveCamera(
+        90,
+        document.body.clientWidth / document.body.clientHeight,
+        0.1,
+        100
+      )
+      camera.position.set(0, 0, 0.01)
 
-			const dracoLoader = new DRACOLoader();
-			dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
-            useSphere()
+      const controls = new OrbitControls(camera, renderer.domElement)
+      controls.target.set(0, 0, 0)
+      controls.update()
+      controls.enablePan = false
+      controls.enableDamping = true
 
-			//全局audio声明
-			var listener = new THREE.AudioListener();
-			camera.add( listener );
+      const dracoLoader = new DRACOLoader()
+      dracoLoader.setDecoderPath('js/libs/draco/gltf/')
+      useSphere()
 
-			// create a global audio source
-			var sound = new THREE.Audio( listener );
+      //全局audio声明
+      var listener = new THREE.AudioListener()
+      camera.add(listener)
 
+      // create a global audio source
+      var sound = new THREE.Audio(listener)
+      loadAnimateModel2()
+      loadAnimateModel3()
+      loadPerson()
+      loadAnimateModel()
+      audioInit()
+      videoInit()
 
-			loadAnimateModel2();
-			loadAnimateModel3();
-			loadPerson()
-			loadAnimateModel();
-			audioInit();
-			// videoInit();
+      window.onresize = function () {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
 
-			window.onresize = function () {
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      }
+      function loadPerson() {
+        const loader = new GLTFLoader()
+        loader.setDRACOLoader(dracoLoader)
+        loader.load(
+          'models/realistic_women/scene.gltf',
+          function (gltf) {
+            const mesh = gltf.scene
+            // model.position.set( 1, 1, 0 );
+            mesh.position.set(0, -0.2, -0.4)
+            mesh.scale.set(0.0002, 0.0002, 0.0002)
+            scene.add(mesh)
+          },
+          undefined,
+          function (e) {
+            console.error(e)
+          }
+        )
+      }
+      function loadAnimateModel() {
+        const loader = new GLTFLoader()
+        loader.setDRACOLoader(dracoLoader)
+        loader.load(
+          'models/gltf/Parrot.glb',
+          function (gltf) {
+            const mesh = gltf.scene
+            // model.position.set( 1, 1, 0 );
+            mesh.position.set(0.2, 0.4, -0.8)
+            mesh.scale.set(0.003, 0.003, 0.003)
+            scene.add(mesh)
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+            mixer = new THREE.AnimationMixer(mesh)
+            console.log(gltf.animations)
+            mixer.clipAction(gltf.animations[0]).play()
+            animate()
+          },
+          undefined,
+          function (e) {
+            console.error(e)
+          }
+        )
+      }
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+      function loadAnimateModel2() {
+        const loader = new GLTFLoader()
+        loader.setDRACOLoader(dracoLoader)
+        loader.load(
+          'models/gltf/Parrot.glb',
+          function (gltf) {
+            const model = gltf.scene
+            // model.position.set( 1, 1, 0 );
+            model.position.set(0.5, 0.2, 0.8)
+            model.scale.set(0.004, 0.004, 0.004)
+            scene.add(model)
 
-			};
-			function loadPerson() {
-				const loader = new GLTFLoader();
-				loader.setDRACOLoader( dracoLoader );
-				loader.load( 'models/realistic_women/scene.gltf', function ( gltf ) {
-					const mesh = gltf.scene;
-					// model.position.set( 1, 1, 0 );
-					mesh.position.set( 0, -0.2, -0.4 );
-					mesh.scale.set( 0.0002, 0.0002, 0.0002 );
-					scene.add( mesh );
-				}, undefined, function ( e ) {
+            mixer = new THREE.AnimationMixer(model)
+            console.log('animate 2')
+            console.log(gltf.animations)
 
-					console.error( e );
+            mixer.clipAction(gltf.animations[0]).play()
 
-				} );
-			}
-			function loadAnimateModel() {
-				const loader = new GLTFLoader();
-				loader.setDRACOLoader( dracoLoader );
-				loader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
-					const mesh = gltf.scene;
-					// model.position.set( 1, 1, 0 );
-					mesh.position.set( 0.2, 0.4, -0.8 );
-					mesh.scale.set( 0.003, 0.003, 0.003 );
-					scene.add( mesh );
+            animate()
+          },
+          undefined,
+          function (e) {
+            console.error(e)
+          }
+        )
+      }
 
-					mixer = new THREE.AnimationMixer( mesh );
-					console.log(gltf.animations)
-					mixer.clipAction( gltf.animations[ 0 ] ).play();
-					animate();
-				}, undefined, function ( e ) {
+      function loadAnimateModel3() {
+        const loader = new GLTFLoader()
+        loader.setDRACOLoader(dracoLoader)
+        loader.load(
+          'models/gltf/Parrot.glb',
+          function (gltf) {
+            const model = gltf.scene
+            // model.position.set( 1, 1, 0 );
+            model.position.set(-0.5, 0.2, -0.3)
+            model.scale.set(0.003, 0.003, 0.003)
+            scene.add(model)
 
-					console.error( e );
+            mixer = new THREE.AnimationMixer(model)
+            mixer.clipAction(gltf.animations[0]).play()
 
-				} );
-			}
+            animate()
+          },
+          undefined,
+          function (e) {
+            console.error(e)
+          }
+        )
+      }
 
-			function loadAnimateModel2() {
-				const loader = new GLTFLoader();
-				loader.setDRACOLoader( dracoLoader );
-				loader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
+      /**
+       *audio相关
+       *
+       **/
+      function audioInit() {
+        // load a sound and set it as the Audio object's buffer
+        var audioLoader = new THREE.AudioLoader()
+        audioLoader.load('./static/sounds/Backroad.ogg', function (buffer) {
+          sound.setBuffer(buffer)
+          sound.setLoop(true)
+          sound.setVolume(0.5)
+        })
+      }
+      function audioPlay() {
+        console.log('start play audio')
+        sound.play()
+      }
+      function audioPause() {
+        console.log('start pause audio')
+        sound.pause()
+      }
 
-					const model = gltf.scene;
-					// model.position.set( 1, 1, 0 );
-					model.position.set( 0.5, 0.2, 0.8 );
-					model.scale.set( 0.004, 0.004, 0.004 );
-					scene.add( model );
+      /**
+       *视频相关
+       **/
+      function videoInit() {
+        //assuming you have created a HTML video element with id="video"
+        var video = document.getElementById('video')
+        setTimeout(() => {
+          video.load()
+        }, 10)
+        video.play()
+        video.style.display = 'none'
+        var texture = new THREE.VideoTexture(video)
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        texture.format = THREE.RGBFormat
+        let geometry = new THREE.PlaneGeometry(120 * 2, 50 * 2, 4, 4)
+        // let material = new THREE.MeshLambertMaterial({ map: texture })
+        let material = new THREE.MeshBasicMaterial({
+          map: texture,
+          transparent: true,
+        })
+        let mesh = new THREE.Mesh(geometry, material)
+        initInput(mesh)
+        mesh.position.set(0.4, 0, -0.5)
+        mesh.scale.set(0.003, 0.008, 0.008)
+        scene.add(mesh)
+      }
+      function initInput(mesh) {
+        var inputX = document.getElementById('rotateInputX')
+        var inputY = document.getElementById('rotateInputY')
+        var inputZ = document.getElementById('rotateInputZ')
+        console.log(mesh)
+        inputX.value = mesh.rotation.x
+        inputY.value = mesh.rotation.y
+        inputZ.value = mesh.rotation.z
+        inputX.addEventListener('input', () => {
+          mesh.rotateX(inputX.value)
+        })
+        inputY.addEventListener('input', () => {
+          mesh.rotateY(inputY.value)
+        })
+        inputZ.addEventListener('input', () => {
+          mesh.rotateZ(inputZ.value)
+        })
+      }
+      function animate() {
+        requestAnimationFrame(animate)
 
-					mixer = new THREE.AnimationMixer( model );
-					console.log('animate 2')
-					console.log(gltf.animations)
-					
-					mixer.clipAction( gltf.animations[ 0 ] ).play();
+        const delta = clock.getDelta()
 
-					animate();
+        mixer.update(delta)
 
-				}, undefined, function ( e ) {
+        controls.update()
 
-					console.error( e );
+        stats.update()
 
-				} );
-			}
+        renderer.render(scene, camera)
+      }
 
-			function loadAnimateModel3() {
-				const loader = new GLTFLoader();
-				loader.setDRACOLoader( dracoLoader );
-				loader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
+      function useSphere(index = 0) {
+        var sphereGeometry = new THREE.SphereGeometry(1, 50, 50)
+        sphereGeometry.scale(1, 1, -1)
+        sphereGeometry.rotateY((180 * Math.PI) / 180)
 
-					const model = gltf.scene;
-					// model.position.set( 1, 1, 0 );
-					model.position.set( -0.5, 0.2, -0.3 );
-					model.scale.set( 0.003, 0.003, 0.003 );
-					scene.add( model );
+        var texture = new THREE.TextureLoader().load(textureArray[index])
+        var sphereMaterial = new THREE.MeshBasicMaterial({ map: texture })
 
-					mixer = new THREE.AnimationMixer( model );
-					mixer.clipAction( gltf.animations[ 0 ] ).play();
+        // var sphereGeometry = new THREE.SphereGeometry(50, 20, 20);
 
-					animate();
-
-				}, undefined, function ( e ) {
-
-					console.error( e );
-
-				} );
-			}
-
-			/**
-			*audio相关
-			*
-			**/
-			function audioInit() {
-				// load a sound and set it as the Audio object's buffer
-				var audioLoader = new THREE.AudioLoader();
-				audioLoader.load( './static/sounds/Backroad.ogg', function( buffer ) {
-					sound.setBuffer( buffer );
-					sound.setLoop( true );
-					sound.setVolume( 0.5 );
-				});
-			}
-			function audioPlay() {
-				console.log('start play audio')
-				sound.play();
-			}
-			function audioPause() {
-				console.log('start pause audio')
-				sound.pause();
-			}
-
-			/**
-			*视频相关
-			**/
-			function videoInit(){
-
-				//assuming you have created a HTML video element with id="video"
-				var video = document.getElementById( 'video' );
-
-				var texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.format = THREE.RGBFormat;
-
-				let geometry = new THREE.BoxGeometry( 1, 50, 50 );
-				let material = new THREE.MeshLambertMaterial( {map: texture} ); 
-				let mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set( 0.01, 0.2, 0 );
-				mesh.scale.set( 0.008, 0.008, 0.008 );
-				scene.add( mesh );
-				
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				const delta = clock.getDelta();
-
-				mixer.update( delta );
-
-				controls.update();
-
-				stats.update();
-
-				renderer.render( scene, camera );
-
-			}
-			
-            function useSphere(index = 0){
-                var sphereGeometry = new THREE.SphereGeometry(1, 50, 50);
-                sphereGeometry.scale(1, 1, -1);
-                sphereGeometry.rotateY(180*Math.PI/180);
-
-                var texture = new THREE.TextureLoader().load(textureArray[index]);
-                var sphereMaterial = new THREE.MeshBasicMaterial({map: texture});
-
-                // var sphereGeometry = new THREE.SphereGeometry(50, 20, 20);
-
-                var sphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
-                // sphere.material.wireframe  = true;
-				sphere.name = 'sphere1'
-                scene.add(sphere);
-            }
-			function pageLoading(){
-				var icon = document.getElementById('loadingIcon')
-				var loading = document.getElementById('loading')
-				loading.classList.add('loading')
-				icon.classList.add('loader8')	
-				loading.classList.remove('loading-out')
-			}
-			window.setTimeout(function(){
-										pageLoaded()
-								}, 1500)			
-			function pageLoaded(){
-				var icon = document.getElementById('loadingIcon')
-				var loading = document.getElementById('loading')
-				loading.classList.remove('loading')
-				loading.classList.add('loading-out')
-				icon.classList.remove('loader8')
-			}
-			$(document).ready(function(){
-				$("#audioPlay").click(function(){
-					audioPlay()
-					$('#audioPlay').hide();
-					$('#audioPause').show();
-
-				});
-				$("#audioPause").click(function(){
-					audioPause()
-					$('#audioPause').hide();
-					$('#audioPlay').show();
-				});
-				$("#next").click(function(){
-					let sceneObject = scene.getObjectByName('sphere1');
-					scene.remove( sceneObject );
-					pageLoading()
-					window.setTimeout(function(){
-							pageLoaded()
-					}, 600)		
-					let index = ++currentTextureIndex
-					if(index >= textureArray.length){
-						index = 0
-						currentTextureIndex = index
-					}
-					useSphere(index)
-				});
-				$("#preview").click(function(){
-					let sceneObject = scene.getObjectByName('sphere1');
-					scene.remove( sceneObject );
-					pageLoading()
-					window.setTimeout(function(){
-							pageLoaded()
-					}, 1500)		
-					let index = --currentTextureIndex
-					if(index < 0){
-						index = textureArray.length -1
-						currentTextureIndex = index
-					}
-					useSphere(index)
-				});
-			});
-		</script>
-
-	</body>
-
+        var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+        // sphere.material.wireframe  = true;
+        sphere.name = 'sphere1'
+        scene.add(sphere)
+      }
+      function pageLoading() {
+        var icon = document.getElementById('loadingIcon')
+        var loading = document.getElementById('loading')
+        loading.classList.add('loading')
+        icon.classList.add('loader8')
+        loading.classList.remove('loading-out')
+      }
+      window.setTimeout(function () {
+        pageLoaded()
+      }, 1500)
+      function pageLoaded() {
+        var icon = document.getElementById('loadingIcon')
+        var loading = document.getElementById('loading')
+        loading.classList.remove('loading')
+        loading.classList.add('loading-out')
+        icon.classList.remove('loader8')
+      }
+      $(document).ready(function () {
+        $('#audioPlay').click(function () {
+          audioPlay()
+          $('#audioPlay').hide()
+          $('#audioPause').show()
+        })
+        $('#audioPause').click(function () {
+          audioPause()
+          $('#audioPause').hide()
+          $('#audioPlay').show()
+        })
+        $('#next').click(function () {
+          let sceneObject = scene.getObjectByName('sphere1')
+          scene.remove(sceneObject)
+          pageLoading()
+          window.setTimeout(function () {
+            pageLoaded()
+          }, 600)
+          let index = ++currentTextureIndex
+          if (index >= textureArray.length) {
+            index = 0
+            currentTextureIndex = index
+          }
+          useSphere(index)
+        })
+        $('#preview').click(function () {
+          let sceneObject = scene.getObjectByName('sphere1')
+          scene.remove(sceneObject)
+          pageLoading()
+          window.setTimeout(function () {
+            pageLoaded()
+          }, 1500)
+          let index = --currentTextureIndex
+          if (index < 0) {
+            index = textureArray.length - 1
+            currentTextureIndex = index
+          }
+          useSphere(index)
+        })
+      })
+    </script>
+  </body>
 </html>
